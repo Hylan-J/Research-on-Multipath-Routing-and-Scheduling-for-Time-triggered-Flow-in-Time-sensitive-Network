@@ -162,7 +162,7 @@ def candidate_routing_sets_filtering(network: Network, flows: List[Flow], p_th: 
     return candidate_routing_sets
 
 
-def generate_flows(num_flow: int, ES_nodes: list):
+def generate_flows(num_flow: int, ES_nodes, range_pr, range_si):
     """
     生成流量
     :param num_flow: 流的数量
@@ -177,9 +177,8 @@ def generate_flows(num_flow: int, ES_nodes: list):
         # random.sample: 无放回抽取
         src, dst = random.sample(ES_nodes, 2)
         # 设置流的周期{1000μs, 2000μs, 4000μs}
-        trans_period = random.choice([1000, 2000, 4000])
-        # 设置流的包大小[64*8 bit, 1512*8 bit]
-        packet_length = 8 * random.randrange(64, 1512, 1)
-        flows.append(
-            Flow(id=id, v_s=src, v_d=dst, pr=trans_period, si=packet_length, dl=300))
+        trans_period = random.choice(range_pr)
+        # 设置流的包大小
+        packet_length = random.choice(range_si)
+        flows.append(Flow(id=id, v_s=src, v_d=dst, pr=trans_period, si=packet_length, dl=300, rl=2))
     return flows

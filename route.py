@@ -3,11 +3,9 @@
 # @Date    : 2024/4/30 2:41
 # @Author  : hylan(https://github.com/Hylan-J)
 # @Description :
-import random
-from typing import List
 
-from Utils import *
 from Configs import *
+from utils import *
 
 
 ########################################################################################################################
