@@ -2,9 +2,10 @@ import math
 
 import matplotlib.pyplot as plt
 
+from Configs import *
 from schedule import *
 from route import *
-from utils import *
+from Utils import *
 
 plt.rcParams['font.sans-serif'] = ['SimHei']
 
@@ -13,7 +14,7 @@ if __name__ == '__main__':
     # 流的个数
     # num_flows = [50, 100, 150, 200, 250, 300]
     num_flows = [10, 20, 30, 40]
-    network = Network(ES_nodes, SW_nodes, edges)
+    network = Network(ES_nodes, SW_nodes, links)
     network.build_topology()
 
     y1 = []
@@ -26,7 +27,7 @@ if __name__ == '__main__':
     # 计算开始时间
     start_time = time()
     # 对流量排序（传输周期小、报文长度短的邮箱）
-    flows.sort(key=lambda x: (x.trans_period, x.packet_length))
+    flows.sort(key=lambda x: (x.pr, x.packet_length))
     # dynamic_flow_balancing_schedule(flows, network, ES_nodes, SW_nodes, edges, routes)
     # solved, t = dynamic_flow_balancing_schedule(flows, network, routes)
     # if solved:

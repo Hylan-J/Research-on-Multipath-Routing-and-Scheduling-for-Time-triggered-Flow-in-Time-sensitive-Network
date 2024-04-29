@@ -1,14 +1,12 @@
-import math
-
 from pulp import *
 
 from Objects.Flow import Flow
 from Objects.Network import Network
-from config import *
+from Configs import *
 
 
 def no_wait_schedule(flows: List[Flow], network: Network, routes: List[List]):
-    edges = network.edges
+    edges = network.links
     ES_nodes = network.ES_nodes
     SW_nodes = network.SW_nodes
 
@@ -20,7 +18,7 @@ def no_wait_schedule(flows: List[Flow], network: Network, routes: List[List]):
     # 定义传输偏移变量
     Phi = LpVariable.dicts(name="Φ",
                            indices=[(flow.id, route_id, vi, vj, flow.id) for flow in flows for route_id in
-                                    range(flow.redundancy_level) for vi, vj in routes[flow.id][route_id]],
+                                    range(flow.rl) for vi, vj in routes[flow.id][route_id]],
                            lowBound=0,
                            upBound=5000,
                            cat=LpInteger)
@@ -30,14 +28,14 @@ def no_wait_schedule(flows: List[Flow], network: Network, routes: List[List]):
     # ---------------------------------------------------------------------------------------------------------------- #
     # 延时约束
     for flow in flows:
-        for route_id in range(flow.redundancy_level):
+        for route_id in range(flow.rl):
             for vi, vj in routes[flow.id][route_id]:
                 problem.addConstraint(LpConstraint(
                     e=Phi[flow.id, route_id, vi, vj],
                     sense=LpConstraintGE,
                     rhs=0))
                 problem.addConstraint(LpConstraint(
-                    e=Phi[flow.id, route_id, vi, vj] - flow.deadline,
+                    e=Phi[flow.id, route_id, vi, vj] - flow.dl,
                     sense=LpConstraintLE,
                     rhs=0))
 
@@ -60,12 +58,12 @@ def no_wait_schedule(flows: List[Flow], network: Network, routes: List[List]):
                                            cat=LpBinary)
 
                             problem.addConstraint(LpConstraint(
-                                e=(Phi[flow_a.id, ii, vi, vj] + network.t_tran(flow_a.packet_length) - Phi[
+                                e=(Phi[flow_a.id, ii, vi, vj] + network.t_tran(flow_a.si) - Phi[
                                     flow_b.id, jj, vi, vj]) * a,
                                 sense=LpConstraintLE,
                                 rhs=0))
                             problem.addConstraint(LpConstraint(
-                                e=(Phi[flow_b.id, jj, vi, vj] + network.t_tran(flow_b.packet_length) - Phi[
+                                e=(Phi[flow_b.id, jj, vi, vj] + network.t_tran(flow_b.si) - Phi[
                                     flow_a.id, ii, vi, vj]) * b,
                                 sense=LpConstraintLE,
                                 rhs=0))
@@ -96,7 +94,7 @@ def no_wait_schedule(flows: List[Flow], network: Network, routes: List[List]):
                 vi, vj = current_edge
                 next_edge = route[i][j + 1]
                 vii, vjj = next_edge
-                hop_delay = network.t_tran(flow.packet_length) + 4
+                hop_delay = network.t_tran(flow.si) + 4
                 problem.addConstraint(LpConstraint(
                     e=Phi[flow.id, i, vii, vjj] - Phi[flow.id, i, vi, vj] - hop_delay,
                     sense=LpConstraintGE,
@@ -111,7 +109,7 @@ def no_wait_schedule(flows: List[Flow], network: Network, routes: List[List]):
         for i in range(len(route)):
             # 最后一段链路的偏移
             b_last, v_d = route[i][-1]
-            temp = Phi[flow.id, i, b_last, v_d].value() + network.t_tran(flow.packet_length)
+            temp = Phi[flow.id, i, b_last, v_d].value() + network.t_tran(flow.si)
             if max_value <= temp:
                 max_value = temp
 

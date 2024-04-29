@@ -1,9 +1,15 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Date    : 2024/4/30 1:26
+# @Author  : hylan(https://github.com/Hylan-J)
+# @Description : 实验的环境常量设置
+
 # 终端节点
 ES_nodes = ['ES0', 'ES1', 'ES2', 'ES3', 'ES4', 'ES5']
 # 交换机节点
 SW_nodes = ['B0', 'B1', 'B2', 'B3', 'B4', 'B5']
 # 链路
-edges = [('ES0', 'B0'), ('ES1', 'B1'), ('ES2', 'B2'),
+links = [('ES0', 'B0'), ('ES1', 'B1'), ('ES2', 'B2'),
          ('ES3', 'B3'), ('ES4', 'B4'), ('ES5', 'B5'),
          ('B0', 'B1'), ('B0', 'B3'), ('B0', 'B4'),
          ('B1', 'B2'), ('B1', 'B3'), ('B1', 'B4'),
@@ -17,6 +23,6 @@ edges = [('ES0', 'B0'), ('ES1', 'B1'), ('ES2', 'B2'),
          ('B4', 'B3'), ('B5', 'B4')]
 
 # 不可靠链路
-unreliable_edges = [('B1', 'B4'), ('B4', 'B1'), ('B0', 'B4'), ('B4', 'B0')]
-p_r = 0.05
-p_ur = 0.2
+unreliable_links = [('B1', 'B4'), ('B4', 'B1'),
+                    ('B0', 'B4'), ('B4', 'B0')]
+

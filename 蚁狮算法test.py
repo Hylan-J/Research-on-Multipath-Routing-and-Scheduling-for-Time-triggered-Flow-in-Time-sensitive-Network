@@ -1,10 +1,12 @@
 import random
 
+
 # 主要蚁狮算法
 def ALO(num_ants, num_lions, candidate_routing_sets, max_iterations):
     """
     蚁狮优化算法（ant_lion_optimization，ALO）
     """
+
     def init_population(num_initial_solutions, candidate_routing_sets):
         """
         随机生成初始解

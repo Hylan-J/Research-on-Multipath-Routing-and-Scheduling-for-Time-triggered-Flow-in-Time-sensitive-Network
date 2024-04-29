@@ -1,16 +1,16 @@
 class Flow:
-    def __init__(self, id, src, dst, trans_period, packet_length, deadline, redundancy_level=2):
+    def __init__(self, id, v_s, v_d, pr, si, dl, rl):
         # 流的id
         self.id = id
         # 源节点
-        self.src = src
-        # 目的节点
-        self.dst = dst
-        # 发送周期, 单位: μs
-        self.trans_period = trans_period
-        # 报文长度, 单位: bit
-        self.packet_length = packet_length
+        self.v_s = v_s
+        # 目标节点
+        self.v_d = v_d
+        # 帧周期, 单位: μs
+        self.pr = pr
+        # 帧大小, 单位: bit
+        self.si = si
         # 截止时间, 单位: μs
-        self.deadline = deadline
-        # 流量的冗余等级
-        self.redundancy_level = redundancy_level
+        self.dl = dl
+        # 冗余等级
+        self.rl = rl
