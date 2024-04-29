@@ -3,23 +3,31 @@
 # @Date    : 2024/4/30 2:41
 # @Author  : hylan(https://github.com/Hylan-J)
 # @Description :
+import random
+from typing import List
+
 from Utils import *
 from Configs import *
+
 
 ########################################################################################################################
 # 元启发式群智能算法：蚁狮算法
 # -------------------------------------------------------------------------------------------------------------------- #
-def ALO(candidate_routes, si, pr, max_iterations):
+def ALO(candidate_routes, si: list, pr: list, max_iterations: int):
     """
     蚁狮优化算法（ant_lion_optimization，ALO）
     """
 
     def objective_1(route, si, pr):
         """
-        目标函数1
-        : parm p: 候选路由集
-        : parm si: 帧大小
-        : parm pr: 帧周期
+        目标函数1：冲突程度
+        Args:
+            route: 所有帧的路由
+            si: 所有帧的大小
+            pr: 所有帧的周期
+
+        Returns:
+
         """
         D = []
         num_flow = len(si)
@@ -35,26 +43,30 @@ def ALO(candidate_routes, si, pr, max_iterations):
 
                 temp = 0
                 for NRS_i in p_i:
-                    for NRS_ii in NRS_i:
+                    for link_ii in NRS_i:
                         for NRS_j in p_j:
-                            if NRS_ii in NRS_j:
+                            if link_ii in NRS_j:
                                 temp += 1
 
                 D.append(temp * (si_i * si_j) / (pr_i * pr_j))
 
         return sum(D)
 
-    def objective_2(routes, si):
+    def objective_2(route, si):
         """
-        目标函数2
-        : parm p: 候选路由集
-        : parm si: 帧大小
+        目标函数2：流延时
+        Args:
+            route: 所有帧的路由
+            si: 所有帧的大小
+
+        Returns:
+
         """
         T = []
         num_flow = len(si)
 
         for i in range(num_flow):
-            NRS = routes[i]
+            NRS = route[i]
             temp = 0
             for _NRS_ in NRS:
                 temp += len(_NRS_)
@@ -74,22 +86,25 @@ def ALO(candidate_routes, si, pr, max_iterations):
         : parm si: 帧大小
         : parm pr: 帧周期
         """
-        W1 = 1000
-        W2 = 1
         objective_1_value = objective_1(current_routes, si, pr)
         objective_2_value = objective_2(current_routes, si)
         # 适应度计算
-        fitness = W1 * objective_1_value + W2 * objective_2_value
+        fitness = W_1 * objective_1_value + W_2 * objective_2_value
         return fitness
 
-    def init_population(num, candidate_routes):
+    def init_population(num_populations: int, num_flows: int, candidate_routes):
         """
         随机生成初始解
-        : parm num_solutions: 需要生成的初始解的个数
-        : parm candidate_routing_sets: 候选路由集
+        Args:
+            num_populations: 需要生成的初始解的个数
+            num_flows: 流量的数量
+            candidate_routes: 候选路由集
+
+        Returns:
+
         """
         init_routes = []
-        for _ in range(num):
+        for _ in range(num_populations):
             random_routes = []
             for i in range(num_flows):
                 # 获取第i个流量的U（即多组NRS）
@@ -107,8 +122,8 @@ def ALO(candidate_routes, si, pr, max_iterations):
     ####################################################################################################################
     # 步骤1：随机生成一系列初始解，作为蚂蚁和蚁狮的初始种群
     # ---------------------------------------------------------------------------------------------------------------- #
-    ants = init_population(num_ants, candidate_routes)
-    antlions = init_population(num_antlions, candidate_routes)
+    ants = init_population(num_ants, num_flows, candidate_routes)
+    antlions = init_population(num_antlions, num_flows, candidate_routes)
 
     ####################################################################################################################
     # 步骤2：拥有最高适应度，即最小成本函数的路由组合成为初始精英蚁狮
@@ -135,10 +150,11 @@ def ALO(candidate_routes, si, pr, max_iterations):
         # 步骤 4：模拟蚁狮和陷阱中蚂蚁的相互作用，更新蚂蚁位置
         # ------------------------------------------------------------------------------------------------------------ #
         antlions_index = [i for i in range(num_antlions)]
-        corresponding = [0 for _ in range(num_antlions)]
+        corresponding = [0] * num_antlions
         for i in range(num_ants):
             # 通过轮盘赌策略为蚂蚁选择一个相应的蚁狮
-            corresponding[i] = random.choices(antlions_index, weights=antlions_fitness, k=1)
+            # 因为random.choices返回的是list，因此需要在最后增加索引
+            corresponding[i] = random.choices(antlions_index, weights=antlions_fitness, k=1)[0]
 
         ################################################################################################################
         # 步骤 5：更新蚁狮种群

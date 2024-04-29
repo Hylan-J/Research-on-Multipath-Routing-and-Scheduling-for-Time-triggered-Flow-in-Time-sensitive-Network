@@ -1,12 +1,28 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Date    : 2024/4/30 2:32
+# @Date    : 2024/4/30 3:20
 # @Author  : hylan(https://github.com/Hylan-J)
-# @Description : 路由相关的util
+# @Description :
 from copy import deepcopy
 from typing import List
+import random
+from Objects import *
 
-from ..Objects import *
+
+def display_schedule_results_by_flows(network, flows, route_results, schedule_results):
+    print('-----------------------------------------------------------------------------------')
+    edges = network.links
+    for flow in flows:
+        print('\n| 流量 {:2d} 的调度结果:'.format(flow.id))
+        route = route_results[flow.id]
+        for i in range(len(route) - 1):
+            for vi, vj in edges:
+                if route[i] == vi and route[i + 1] == vj:
+                    start_time = schedule_results[vi, vj, flow.id].varValue
+                    if start_time != 0:
+                        end_time = start_time + network.t_tran(flow.packet_length)
+                        print('| 链路 {}-{} : {:5f} μs - {:5f} μs'.format(vi, vj, start_time, end_time))
+    print('-----------------------------------------------------------------------------------')
 
 
 def cal_probability(NRS, unreliable_edges, p_r, p_ur):
@@ -144,3 +160,26 @@ def candidate_routing_sets_filtering(network: Network, flows: List[Flow], p_th: 
         candidate_routing_sets.append(U)
 
     return candidate_routing_sets
+
+
+def generate_flows(num_flow: int, ES_nodes: list):
+    """
+    生成流量
+    :param num_flow: 流的数量
+    :param ES_nodes: 终端节点
+    :return:
+    """
+    flows = []
+    for i in range(num_flow):
+        # 获取流的id
+        id = i
+        # 获取流的源节点和目的节点
+        # random.sample: 无放回抽取
+        src, dst = random.sample(ES_nodes, 2)
+        # 设置流的周期{1000μs, 2000μs, 4000μs}
+        trans_period = random.choice([1000, 2000, 4000])
+        # 设置流的包大小[64*8 bit, 1512*8 bit]
+        packet_length = 8 * random.randrange(64, 1512, 1)
+        flows.append(
+            Flow(id=id, v_s=src, v_d=dst, pr=trans_period, si=packet_length, dl=300))
+    return flows

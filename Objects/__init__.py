@@ -4,5 +4,5 @@
 # @Author  : hylan(https://github.com/Hylan-J)
 # @Description :
 
-from Flow import *
-from Network import *
+from .Flow import *
+from .Network import *
