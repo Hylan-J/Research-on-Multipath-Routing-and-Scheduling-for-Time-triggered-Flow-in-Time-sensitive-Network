@@ -3,21 +3,20 @@ from Objects import *
 from utils import candidate_routing_sets_filtering
 
 # 表 3.2 示例中流集合 S 的参数
-flow1 = Flow(id=1, v_s='ES0', v_d='ES5', pr=50, si=80, dl=300, rl=2)
-flow2 = Flow(id=2, v_s='ES1', v_d='ES3', pr=100, si=160, dl=250, rl=2)
-flow3 = Flow(id=3, v_s='ES2', v_d='ES1', pr=50, si=160, dl=300, rl=2)
-flow4 = Flow(id=4, v_s='ES1', v_d='ES4', pr=200, si=320, dl=250, rl=2)
+flow1 = Flow(id=1, src='ES0', dst='ES5', period=50, size=80, deadline=300, redundancy_level=2)
+flow2 = Flow(id=2, src='ES1', dst='ES3', period=100, size=160, deadline=250, redundancy_level=2)
+flow3 = Flow(id=3, src='ES2', dst='ES1', period=50, size=160, deadline=300, redundancy_level=2)
+flow4 = Flow(id=4, src='ES1', dst='ES4', period=200, size=320, deadline=250, redundancy_level=2)
 flows = [flow1, flow2, flow3, flow4]
 
 network = Network(ES_nodes=ES_nodes,
                   SW_nodes=SW_nodes,
-                  links=links,
-                  unreliable_links=unreliable_links,
-                  link_speed=1,
-                  t_switch=4,
-                  p_r=0.05,
-                  p_ur=0.2)
-network.build_topology()
+                  edges=edges,
+                  unreliable_edges=unreliable_egdes,
+                  edge_speed=1,
+                  delay_switch_process=4,
+                  probability_reliable=0.05,
+                  probability_unreliable=0.2)
 si = [80, 160, 160, 320]
 pr = [50, 100, 50, 200]
 candidate_routing_sets = candidate_routing_sets_filtering(network=network,

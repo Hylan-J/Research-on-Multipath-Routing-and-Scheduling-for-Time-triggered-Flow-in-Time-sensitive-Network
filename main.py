@@ -1,5 +1,6 @@
 import math
 import os.path
+from time import time
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -17,12 +18,12 @@ if __name__ == '__main__':
     num_flows = [10, 20, 30, 40]
     network = Network(ES_nodes=ES_nodes,
                       SW_nodes=SW_nodes,
-                      links=links,
-                      unreliable_links=unreliable_links,
-                      link_speed=link_speed,
-                      t_switch=t_switch,
-                      p_r=p_r,
-                      p_ur=p_ur)
+                      edges=edges,
+                      unreliable_edges=unreliable_egdes,
+                      edge_speed=link_speed,
+                      delay_switch_process=t_switch,
+                      probability_reliable=p_r,
+                      probability_unreliable=p_ur)
     network.build_topology()
 
     saved = os.path.exists('flows.npy')
@@ -35,13 +36,11 @@ if __name__ == '__main__':
         flows = generate_flows(num_flow=num_flow, ES_nodes=ES_nodes, range_pr=range_pr, range_si=range_si)
     #
     candidate_routes = candidate_routing_sets_filtering(network, flows, 0.0)
-    si = [flow.si for flow in flows]
-    pr = [flow.pr for flow in flows]
+    si = [flow.size for flow in flows]
+    pr = [flow.period for flow in flows]
     routes = ALO(candidate_routes=candidate_routes, si=si, pr=pr, max_iterations=100)
     # 计算开始时间
     start_time = time()
-    # 对流量排序（传输周期小、报文长度短的邮箱）
-    # flows.sort(key=lambda x: (x.pr, x.packet_length))
 
     solved, t = no_wait_schedule(network=network, flows=flows, routes=routes)
     if solved:

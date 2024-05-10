@@ -11,7 +11,7 @@ from Objects import *
 
 def display_schedule_results_by_flows(network, flows, route_results, schedule_results):
     print('-----------------------------------------------------------------------------------')
-    edges = network.links
+    edges = network.edges
     for flow in flows:
         print('\n| 流量 {:2d} 的调度结果:'.format(flow.id))
         route = route_results[flow.id]
@@ -75,7 +75,7 @@ def find_NRSs(flow: Flow, routes: List[list], length_target: int):
             routes_target.append(route)
 
     # 如果路由个数小于流量的冗余等级，那么不可能存在NRS，返回 None
-    if len(routes_target) < flow.rl:
+    if len(routes_target) < flow.redundancy_level:
         return []
     # 如果路由个数大于等于流量的冗余等级，那么可能存在NRS，寻找不相交的路由
     else:
@@ -114,7 +114,7 @@ def candidate_routing_sets_filtering(network: Network, flows: List[Flow], p_th: 
         routes = []
         routes_length = []
         # nx.all_simple_paths(network.G, flow.src, flow.dst)返回示例：[[A,B,C,D], [A,C,B,D]]
-        for path in list(nx.all_simple_paths(network.topology, flow.v_s, flow.v_d)):
+        for path in list(nx.all_simple_paths(network.topology, flow.src, flow.dst)):
             route = []
             for i in range(len(path) - 1):
                 route.append([path[i], path[i + 1]])
@@ -146,7 +146,7 @@ def candidate_routing_sets_filtering(network: Network, flows: List[Flow], p_th: 
                 else:
                     for NRS in NRSs:
                         # 针对每个NRS组，计算其概率
-                        p_m = cal_probability(NRS, network.unreliable_links, network.p_r, network.p_ur)
+                        p_m = cal_probability(NRS, network.unreliable_edges, network.probability_reliable, network.probability_unreliable)
                         #
                         if p_m < p_th:
                             NRSs.remove(NRS)
@@ -180,5 +180,15 @@ def generate_flows(num_flow: int, ES_nodes, range_pr, range_si):
         trans_period = random.choice(range_pr)
         # 设置流的包大小
         packet_length = random.choice(range_si)
-        flows.append(Flow(id=id, v_s=src, v_d=dst, pr=trans_period, si=packet_length, dl=300, rl=2))
+        flows.append(Flow(id=id, src=src, dst=dst, period=trans_period, size=packet_length, deadline=300, redundancy_level=2))
     return flows
+
+
+def calculate_lcm(periods):
+    """
+    计算所有流量的超周期
+    """
+    super_period = periods[0]
+    for period in periods[1:]:
+        super_period = np.lcm(super_period, period)
+    return super_period
