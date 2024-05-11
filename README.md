@@ -1,6 +1,6 @@
 # Research-on-Multipath-Routing-and-Scheduling-for-Time-triggered-Flow-in-Time-sensitive-Network
 
-论文《面向时间敏感网络的时间触发流多路径路由和调度研究》[https://kns.cnki.net/kcms2/article/abstract?v=HiJCKhV2ch5YwUlc3KbmTJiHJgay3BwEJBlgnDIaOBwtgxS2v5yf2A0Msh5LBVBIfPcdQfxBdnig0_QAp-b29Kix4IfF_JZm0bC-sEIKoKGb4GnmfxkSD-mULahbEdm_VMl0AaedyuqkKQ3nzZdhPg==&uniplatform=NZKPT&language=CHS]的python实现，ILP通过gurobipy库实现
+论文[《面向时间敏感网络的时间触发流多路径路由和调度研究》](https://kns.cnki.net/kcms2/article/abstract?v=HiJCKhV2ch5YwUlc3KbmTJiHJgay3BwEJBlgnDIaOBwtgxS2v5yf2A0Msh5LBVBIfPcdQfxBdnig0_QAp-b29Kix4IfF_JZm0bC-sEIKoKGb4GnmfxkSD-mULahbEdm_VMl0AaedyuqkKQ3nzZdhPg==&uniplatform=NZKPT&language=CHS)的python实现，ILP通过gurobipy库实现
 
 ## 部分重要实现说明
 
