@@ -1,13 +1,9 @@
-import math
-import os.path
 from time import time
 
 import matplotlib.pyplot as plt
-import numpy as np
 
-from Configs import *
-from schedule import *
 from route import *
+from schedule import *
 from utils import *
 
 plt.rcParams['font.sans-serif'] = ['SimHei']
@@ -20,33 +16,40 @@ if __name__ == '__main__':
                       SW_nodes=SW_nodes,
                       edges=edges,
                       unreliable_edges=unreliable_egdes,
-                      edge_speed=link_speed,
-                      delay_switch_process=t_switch,
-                      probability_reliable=p_r,
-                      probability_unreliable=p_ur)
-    network.build_topology()
+                      edge_speed=edge_speed,
+                      delay_switch_process=delay_switch_process,
+                      probability_reliable=probability_reliable,
+                      probability_unreliable=probability_unreliable)
 
-    saved = os.path.exists('flows.npy')
-    y1 = []
-    # for num_flow in num_flows:
-    num_flow = 20
-    if saved:
-        flows = np.load('flows.npy', allow_pickle=True)
-    else:
-        flows = generate_flows(num_flow=num_flow, ES_nodes=ES_nodes, range_pr=range_pr, range_si=range_si)
+    # saved = os.path.exists('flows.npy')
     #
+    # # for num_flow in num_flows:
+    # num_flow = 10
+    # if saved:
+    #     flows = np.load('flows.npy', allow_pickle=True)
+    # else:
+    #     flows = generate_flows(num_flow=num_flow, ES_nodes=ES_nodes, range_pr=range_pr, range_si=range_si)
+
+    # flows = np.load('flows.npy', allow_pickle=True)
+    flows = generate_flows(num_flow=10, ES_nodes=ES_nodes, range_pr=range_pr, range_si=range_si)
     candidate_routes = candidate_routing_sets_filtering(network, flows, 0.0)
     si = [flow.size for flow in flows]
     pr = [flow.period for flow in flows]
-    routes = ALO(candidate_routes=candidate_routes, si=si, pr=pr, max_iterations=100)
+    routes = ALO(candidate_flows_NRSs=candidate_routes, sizes=si, periods=pr, max_iterations=100)
+    print(routes)
+    # 获取所有帧的传输周期
+    periods = [frame.period for frame in flows]
+    # 计算调度的超周期
+    hyper_period = calculate_lcm(periods)
+
     # 计算开始时间
     start_time = time()
 
-    solved, t = no_wait_schedule(network=network, flows=flows, routes=routes)
+    solved, Phi = no_wait_schedule(network=network, frames=flows, flows_NRS=routes)
     if solved:
         print('调度成功！')
-        if not saved:
-            np.save('flows.npy', flows, allow_pickle=True)
+        # np.save('flows.npy', flows, allow_pickle=True)
+        # if not saved:
+        #     np.save('flows.npy', flows, allow_pickle=True)
     # 计算结束时间
     end_time = time()
-    y1.append(end_time - start_time)

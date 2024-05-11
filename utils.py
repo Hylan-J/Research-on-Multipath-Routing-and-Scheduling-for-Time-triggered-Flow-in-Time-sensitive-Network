@@ -6,6 +6,9 @@
 from copy import deepcopy
 from typing import List
 import random
+
+import numpy as np
+
 from Objects import *
 
 
@@ -146,7 +149,8 @@ def candidate_routing_sets_filtering(network: Network, flows: List[Flow], p_th: 
                 else:
                     for NRS in NRSs:
                         # 针对每个NRS组，计算其概率
-                        p_m = cal_probability(NRS, network.unreliable_edges, network.probability_reliable, network.probability_unreliable)
+                        p_m = cal_probability(NRS, network.unreliable_edges, network.probability_reliable,
+                                              network.probability_unreliable)
                         #
                         if p_m < p_th:
                             NRSs.remove(NRS)
@@ -180,7 +184,8 @@ def generate_flows(num_flow: int, ES_nodes, range_pr, range_si):
         trans_period = random.choice(range_pr)
         # 设置流的包大小
         packet_length = random.choice(range_si)
-        flows.append(Flow(id=id, src=src, dst=dst, period=trans_period, size=packet_length, deadline=300, redundancy_level=2))
+        flows.append(
+            Flow(id=id, src=src, dst=dst, period=trans_period, size=packet_length, deadline=300, redundancy_level=2))
     return flows
 
 
@@ -188,7 +193,7 @@ def calculate_lcm(periods):
     """
     计算所有流量的超周期
     """
-    super_period = periods[0]
+    hyper_period = periods[0]
     for period in periods[1:]:
-        super_period = np.lcm(super_period, period)
-    return super_period
+        hyper_period = np.lcm(hyper_period, period)
+    return hyper_period
