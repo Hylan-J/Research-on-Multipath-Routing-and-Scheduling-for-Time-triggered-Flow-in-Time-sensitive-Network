@@ -18,4 +18,4 @@
 ### 无等待调度部分实现
 将避免竞争约束（Contention-free Constraints）【论文公式4.6、4.7】结合其对应的二元互斥变量，转化为如下公式：
 
-$$\Phi_{s_i}(m,l)+\Phi_{s_j}(n,l)+a\cdot(T_c\cdot w_{s_i}-2\Phi_{s_j}(n,l))+b\cdot(T_c\cdot w_{s_j}-2\Phi_{s_i}(m,l))$$
+$$\Phi_{s_i}(m,l)+\Phi_{s_j}(n,l)+a\cdot(T_c\cdot w_{s_i}-2\Phi_{s_j}(n,l))+b\cdot(T_c\cdot w_{s_j}-2\Phi_{s_i}(m,l))  \le 0$$
